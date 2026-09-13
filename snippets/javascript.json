@@ -1,0 +1,129 @@
+{
+  "Frappe Form Script": {
+    "prefix": "frappe-form",
+    "description": "Create a Frappe form script.",
+    "body": [
+      "frappe.ui.form.on(\"${1:DocType}\", {",
+      "\trefresh(frm) {",
+      "\t\t${0}",
+      "\t}",
+      "});"
+    ]
+  },
+  "Frappe Field Trigger": {
+    "prefix": "frappe-field",
+    "description": "Create a Frappe field trigger.",
+    "body": [
+      "${1:fieldname}(frm) {",
+      "\t${0}",
+      "}"
+    ]
+  },
+  "Frappe Child Table Trigger": {
+    "prefix": "frappe-child",
+    "description": "Create a child table form script.",
+    "body": [
+      "frappe.ui.form.on(\"${1:Child DocType}\", {",
+      "\t${2:fieldname}(frm, cdt, cdn) {",
+      "\t\tconst row = locals[cdt][cdn];",
+      "\t\t${0}",
+      "\t}",
+      "});"
+    ]
+  },
+  "Frappe Call": {
+    "prefix": "frappe-call",
+    "description": "Call a whitelisted Frappe method.",
+    "body": [
+      "frappe.call({",
+      "\tmethod: \"${1:app.module.path.method}\",",
+      "\targs: {",
+      "\t\t${2:key}: ${3:value}",
+      "\t},",
+      "\tcallback(r) {",
+      "\t\t${0}",
+      "\t}",
+      "});"
+    ]
+  },
+  "Frappe Set Query": {
+    "prefix": "frappe-set-query",
+    "description": "Set a Link field query.",
+    "body": [
+      "frm.set_query(\"${1:fieldname}\", () => {",
+      "\treturn {",
+      "\t\tfilters: {",
+      "\t\t\t${2:fieldname}: ${3:value}",
+      "\t\t}",
+      "\t};",
+      "});"
+    ]
+  },
+  "Frappe Custom Button": {
+    "prefix": "frappe-button",
+    "description": "Add a custom button to a Frappe form.",
+    "body": [
+      "frm.add_custom_button(__(\"${1:Button Label}\"), () => {",
+      "\t${0}",
+      "});"
+    ]
+  },
+  "Frappe Dialog": {
+    "prefix": "frappe-dialog",
+    "description": "Create and show a Frappe dialog.",
+    "body": [
+      "const dialog = new frappe.ui.Dialog({",
+      "\ttitle: __(\"${1:Title}\"),",
+      "\tfields: [",
+      "\t\t{",
+      "\t\t\tfieldname: \"${2:fieldname}\",",
+      "\t\t\tlabel: __(\"${3:Label}\"),",
+      "\t\t\tfieldtype: \"${4:Data}\"",
+      "\t\t}",
+      "\t],",
+      "\tprimary_action_label: __(\"${5:Submit}\"),",
+      "\tprimary_action(values) {",
+      "\t\t${0}",
+      "\t\tdialog.hide();",
+      "\t}",
+      "});",
+      "",
+      "dialog.show();"
+    ]
+  },
+  "Frappe Set Value": {
+    "prefix": "frappe-set-value",
+    "description": "Set a field value on a Frappe form.",
+    "body": [
+      "frm.set_value(\"${1:fieldname}\", ${2:value});"
+    ]
+  },
+  "Frappe Listview Settings": {
+    "prefix": "frappe-listview",
+    "description": "Create Frappe listview settings.",
+    "body": [
+      "frappe.listview_settings[\"${1:DocType}\"] = {",
+      "\tonload(listview) {",
+      "\t\t${0}",
+      "\t}",
+      "};"
+    ]
+  },
+  "Frappe Query Report": {
+    "prefix": "frappe-query-report",
+    "description": "Create query report filters.",
+    "body": [
+      "frappe.query_reports[\"${1:Report Name}\"] = {",
+      "\tfilters: [",
+      "\t\t{",
+      "\t\t\tfieldname: \"${2:company}\",",
+      "\t\t\tlabel: __(\"${3:Company}\"),",
+      "\t\t\tfieldtype: \"${4:Link}\",",
+      "\t\t\toptions: \"${5:Company}\",",
+      "\t\t\treqd: 1",
+      "\t\t}",
+      "\t]",
+      "};"
+    ]
+  }
+}

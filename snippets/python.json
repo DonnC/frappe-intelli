@@ -1,0 +1,140 @@
+{
+  "Frappe DocType Controller": {
+    "prefix": "frappe-controller",
+    "description": "Create a Frappe DocType controller class.",
+    "body": [
+      "import frappe",
+      "from frappe import _",
+      "from frappe.model.document import Document",
+      "",
+      "",
+      "class ${1:DocTypeClass}(Document):",
+      "\tdef validate(self):",
+      "\t\t${0:pass}"
+    ]
+  },
+  "Frappe Whitelisted Method": {
+    "prefix": "frappe-whitelist",
+    "description": "Create a whitelisted Frappe method.",
+    "body": [
+      "import frappe",
+      "from frappe import _",
+      "",
+      "",
+      "@frappe.whitelist()",
+      "def ${1:method_name}(${2}):",
+      "\t${0:return {}}"
+    ]
+  },
+  "Frappe Guest Whitelisted Method": {
+    "prefix": "frappe-whitelist-guest",
+    "description": "Create a guest-accessible whitelisted Frappe method.",
+    "body": [
+      "import frappe",
+      "",
+      "",
+      "@frappe.whitelist(allow_guest=True)",
+      "def ${1:method_name}(${2}):",
+      "\t${0:return {}}"
+    ]
+  },
+  "Frappe Patch": {
+    "prefix": "frappe-patch",
+    "description": "Create a Frappe patch execute function.",
+    "body": [
+      "import frappe",
+      "",
+      "",
+      "def execute():",
+      "\t${0:pass}"
+    ]
+  },
+  "Frappe Report Execute": {
+    "prefix": "frappe-report",
+    "description": "Create a script report execute function.",
+    "body": [
+      "import frappe",
+      "from frappe import _",
+      "",
+      "",
+      "def execute(filters=None):",
+      "\tfilters = frappe._dict(filters or {})",
+      "\tcolumns = ${1:get_columns()}",
+      "\tdata = ${2:get_data(filters)}",
+      "\treturn columns, data",
+      "",
+      "",
+      "def get_columns():",
+      "\treturn [",
+      "\t\t{\"label\": _(\"${3:Name}\"), \"fieldname\": \"${4:name}\", \"fieldtype\": \"Data\", \"width\": 180},",
+      "\t]",
+      "",
+      "",
+      "def get_data(filters):",
+      "\t${0:return []}"
+    ]
+  },
+  "Frappe Throw Translated": {
+    "prefix": "frappe-throw",
+    "description": "Throw a translated Frappe exception.",
+    "body": [
+      "frappe.throw(_(\"${1:Message}\"))"
+    ]
+  },
+  "Frappe Background Job": {
+    "prefix": "frappe-enqueue",
+    "description": "Enqueue a background job.",
+    "body": [
+      "frappe.enqueue(",
+      "\t\"${1:app.module.path.method}\",",
+      "\tqueue=\"${2:default}\",",
+      "\t${3:timeout=300,}",
+      "\t${0}",
+      ")"
+    ]
+  },
+  "Frappe Get Doc": {
+    "prefix": "frappe-get-doc",
+    "description": "Fetch a Frappe document.",
+    "body": [
+      "doc = frappe.get_doc(\"${1:DocType}\", ${2:name})"
+    ]
+  },
+  "Frappe DB Get Value": {
+    "prefix": "frappe-db-get-value",
+    "description": "Read a single value with frappe.db.get_value.",
+    "body": [
+      "${1:value} = frappe.db.get_value(\"${2:DocType}\", ${3:name}, \"${4:fieldname}\")"
+    ]
+  },
+  "Frappe Get All": {
+    "prefix": "frappe-get-all",
+    "description": "Fetch rows with frappe.get_all.",
+    "body": [
+      "${1:rows} = frappe.get_all(",
+      "\t\"${2:DocType}\",",
+      "\tfilters={\"${3:fieldname}\": ${4:value}},",
+      "\tfields=[\"${5:name}\"],",
+      ")"
+    ]
+  },
+  "Frappe Permission Query Condition": {
+    "prefix": "frappe-permission-query",
+    "description": "Create a permission query condition function.",
+    "body": [
+      "def ${1:get_permission_query_conditions}(user):",
+      "\tif not user:",
+      "\t\tuser = frappe.session.user",
+      "\t${0:return \"\"}"
+    ]
+  },
+  "Frappe Has Permission": {
+    "prefix": "frappe-has-permission",
+    "description": "Create a has_permission hook function.",
+    "body": [
+      "def ${1:has_permission}(doc, user=None, permission_type=None):",
+      "\tuser = user or frappe.session.user",
+      "\t${0:return True}"
+    ]
+  }
+}

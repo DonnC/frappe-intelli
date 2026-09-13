@@ -1,0 +1,37 @@
+{
+  "Frappe DocType Field": {
+    "prefix": "frappe-field",
+    "description": "Create a DocType field JSON object.",
+    "body": [
+      "{",
+      "\t\"fieldname\": \"${1:fieldname}\",",
+      "\t\"fieldtype\": \"${2:Data}\",",
+      "\t\"label\": \"${3:Label}\"",
+      "}"
+    ]
+  },
+  "Frappe Link Field": {
+    "prefix": "frappe-link-field",
+    "description": "Create a Link field JSON object.",
+    "body": [
+      "{",
+      "\t\"fieldname\": \"${1:fieldname}\",",
+      "\t\"fieldtype\": \"Link\",",
+      "\t\"label\": \"${2:Label}\",",
+      "\t\"options\": \"${3:DocType}\"",
+      "}"
+    ]
+  },
+  "Frappe Table Field": {
+    "prefix": "frappe-table-field",
+    "description": "Create a Table field JSON object.",
+    "body": [
+      "{",
+      "\t\"fieldname\": \"${1:items}\",",
+      "\t\"fieldtype\": \"Table\",",
+      "\t\"label\": \"${2:Items}\",",
+      "\t\"options\": \"${3:Child DocType}\"",
+      "}"
+    ]
+  }
+}
