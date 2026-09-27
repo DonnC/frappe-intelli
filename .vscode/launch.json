@@ -6,8 +6,7 @@
       "type": "extensionHost",
       "request": "launch",
       "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}",
-        "/home/dezlar/frappe-bench"
+        "--extensionDevelopmentPath=${workspaceFolder}"
       ],
       "outFiles": []
     }

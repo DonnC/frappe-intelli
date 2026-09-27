@@ -33,7 +33,7 @@ You can also set the bench path manually:
 
 ```json
 {
-  "frappeIntelli.benchPath": "/home/uname/frappe-bench"
+  "frappeIntelli.benchPath": "/path/to/frappe-bench"
 }
 ```
 
@@ -123,6 +123,7 @@ Use VS Code's normal **Go to Definition** command.
 Supported targets:
 
 - DocType string -> DocType JSON
+- Report string -> report JSON
 - Dotted method string -> Python source function
 - `patches.txt` entry -> patch file and `execute()`
 
@@ -143,6 +144,16 @@ and jumps to:
 ```python
 def execute():
 ```
+
+### CodeLens
+
+Frappe Intelli adds inline actions above common Frappe entry points:
+
+- `patches.txt` entries get **Open patch execute()**
+- `frappe.ui.form.on("DocType")` blocks get **Open DocType JSON**
+- form scripts get **Open controller** when a Python controller exists
+- `frappe.query_reports["Report"]` entries get **Open report JSON**
+- script reports get **Open report Python** when a Python report file exists
 
 ### Translation Diagnostics
 
@@ -173,6 +184,8 @@ Inside inferred DocType controller and form files, the extension warns when:
 
 - `self.some_field` is not present in the DocType JSON
 - `frm.doc.some_field` is not present in the DocType JSON
+- `self.get("some_field")` references an unknown field
+- `frm.set_value("some_field")` and related form calls reference unknown fields
 
 Standard Frappe document fields such as `name`, `doctype`, `owner`, `creation`, `modified`, `docstatus`, and `idx` are allowed.
 
@@ -187,6 +200,20 @@ This helps catch broken paths in:
 - `override_whitelisted_methods`
 - `permission_query_conditions`
 - `has_permission`
+
+### Fixture Diagnostics
+
+In `hooks.py`, fixtures are checked against indexed DocTypes.
+
+Supported fixture shapes include:
+
+```python
+fixtures = [
+    "Custom Field",
+    {"dt": "Property Setter"},
+    {"doctype": "Workspace"},
+]
+```
 
 ### Bench Commands
 
@@ -204,6 +231,7 @@ Commands are available from the VS Code Command Palette:
 - `Frappe Intelli: Open Current DocType JSON`
 - `Frappe Intelli: Open Current Controller`
 - `Frappe Intelli: Create Patch`
+- `Frappe Intelli: Show Index Status`
 
 Bench commands open a VS Code terminal in the bench root and run the matching `bench` command. Site-specific commands use the selected site.
 
@@ -215,9 +243,10 @@ The Frappe activity bar view shows:
 - sites
 - installed apps
 - indexed DocTypes
+- indexed reports
 - indexed patch paths
 
-Click a DocType to open its JSON file.
+Click a DocType or report to open its JSON file.
 
 ### Snippets
 
@@ -264,7 +293,7 @@ This is the easiest way to test while developing the extension.
 1. Open this folder in VS Code:
 
    ```bash
-   code /home/uname/projects/frappe-intelli
+   code /path/to/frappe-intelli
    ```
 
 2. Press `F5`.
@@ -274,7 +303,7 @@ This is the easiest way to test while developing the extension.
 4. In that new window, open your bench:
 
    ```bash
-   code /home/uname/frappe-bench
+   code /path/to/frappe-bench
    ```
 
 5. Run:
@@ -288,7 +317,7 @@ This is the easiest way to test while developing the extension.
 Install `vsce` packaging dependencies:
 
 ```bash
-cd /home/uname/projects/frappe-intelli
+cd /path/to/frappe-intelli
 npm install
 ```
 
@@ -311,15 +340,15 @@ Reload VS Code and open your Frappe bench.
 For your bench workspace, create or update:
 
 ```text
-/home/uname/frappe-bench/.vscode/settings.json
+/path/to/frappe-bench/.vscode/settings.json
 ```
 
 Example:
 
 ```json
 {
-  "frappeIntelli.benchPath": "/home/uname/frappe-bench",
-  "frappeIntelli.defaultSite": "mtms.localhost",
+  "frappeIntelli.benchPath": "/path/to/frappe-bench",
+  "frappeIntelli.defaultSite": "site.localhost",
   "frappeIntelli.enableDiagnostics": true,
   "frappeIntelli.indexCustomAppsOnly": false
 }
@@ -341,7 +370,7 @@ If snippets appear but DocType or field autocomplete does not, the extension hos
 
    ```json
    {
-     "frappeIntelli.benchPath": "/home/uname/frappe-bench"
+     "frappeIntelli.benchPath": "/path/to/frappe-bench"
    }
    ```
 
@@ -415,9 +444,31 @@ Default:
 false
 ```
 
-## Development
+### `frappeIntelli.indexWhitelistedMethodsOnly`
+
+When enabled, dotted method completions only include Python functions decorated with `@frappe.whitelist()`.
+
+Default:
+
+```json
+false
+```
+
+## Architecture
+
+Frappe Intelli is intentionally organized as small CommonJS modules:
+
+- `src/extension.js`: VS Code activation, provider registration, and file watchers
+- `src/state.js`: bench discovery, app indexing, DocType indexing, report indexing, and method indexing
+- `src/commands.js`: command palette handlers and terminal-backed bench commands
+- `src/diagnostics.js`: diagnostics for patches, translations, hooks, fixtures, and field references
+- `src/inference.js`: DocType inference helpers shared by providers and diagnostics
+- `src/providers/*`: completion, definition, hover, CodeLens, and tree providers
+- `src/utils.js`: filesystem, path, range, and VS Code helper functions
 
 The extension currently uses plain JavaScript and Node built-ins. There is no compile step.
+
+## Development
 
 Check syntax:
 
@@ -444,22 +495,16 @@ Then press `F5`.
 This is an intentionally practical first release. Some inference is heuristic:
 
 - field completions work best in normal DocType controller and form script locations
-- nested child table field inference is basic
-- hook diagnostics check dotted strings broadly and may report false positives for non-function dotted values
+- child table inference follows nearby `frappe.ui.form.on("Child DocType")` blocks, but unusual dynamic patterns may still need manual navigation
+- hook diagnostics are scoped to known hook method blocks, but unusual dynamic hook construction may still need manual review
 - diagnostics do not parse Python or JavaScript ASTs yet
-- whitelisted method detection indexes all top-level Python functions, not only decorated functions
 
 These tradeoffs keep the extension fast, dependency-light, and immediately usable.
 
 ## Roadmap
 
 - AST-based Python and JavaScript parsing
-- precise child table field inference
-- whitelisted-method-only indexing mode
-- CodeLens above patch entries
-- CodeLens above `frappe.ui.form.on`
-- fixture diagnostics
-- report file navigation
+- deeper child table context tracking across helper functions
 - DocType creation wizard
 - typed stub generation for custom apps
 - dedicated Language Server Protocol backend for larger benches
